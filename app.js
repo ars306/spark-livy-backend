@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const sessionRoute = require("./routes/session-route");
 const statementRoute = require("./routes/statement-route");
 const mongoose = require("mongoose");
+const HttpError = require("./models/http-error");
 
 const connectUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.slxab.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
@@ -28,6 +29,11 @@ app.use((req, res, next) => {
 
 app.use("/api/sessions", sessionRoute);
 app.use("/api/statements", statementRoute);
+
+app.use((req, re, next) => {
+  const error = new HttpError("Could not find this route", 404);
+  return next(error);
+});
 
 app.use((error, req, res, next) => {
   // console.log(res.headerSent);
